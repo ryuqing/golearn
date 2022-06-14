@@ -52,7 +52,7 @@ func run()  {
 	err = json.Unmarshal(content, &existRecords)
 
 
-	firstCont,contentLink := getBanFirstAnnounce();
+	firstCont,contentLink := getBanFirstAnnounce()
 	if len(firstCont) < 1 {
 		log.Fatalln("获取币安信息失败")
 	}
