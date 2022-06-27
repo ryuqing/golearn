@@ -65,3 +65,56 @@ float64（+- 5  1e-324 -> 107  1e308）
 
 
 
+#### 第九章 包
+
+注：原文这一块讲的不是很好并且过时不适用了-- 所以原文可以忽略不看
+所以参考的网络文章：https://cloud.tencent.com/developer/article/1859833
+
+Go1.12 版本后, 使用go modules进行包管理
+
+
+#### 第十章、十一章 <结构体方法>和<接口与反射>观看视频更加高效
+主要了解go里面"类"、方法、继承等如何使用
+
+
+#### 第十三章 错误处理与测试
+> 通过学习这一章，我们得会知道如何优雅的处理程序的错误。
+
+**13.1 错误处理**
+go中有一个预定义的错误
+```
+type error interface {
+    Error() string
+}
+//自定义错误
+var errNotFound error = errors.New("Not found error")
+
+
+```
+
+
+
+**13.2-13.3: 两个关键字 panic和recover**
+
+panic 能够改变程序的控制流，调用 panic 后会立刻停止执行当前函数的剩余代码，并在当前 Goroutine 中递归执行调用方的 defer；
+recover 可以中止 panic 造成的程序崩溃。它是一个只能在 defer 中发挥作用的函数,并且可以接收panic传过来的参数信息；
+
+来看下面这个例子，当我们运行这段代码时会发现 main 函数中的 defer 语句并没有执行，执行的只有当前 Goroutine 中的 defer。
+```
+func main() {
+	defer println("in main")
+	go func() {
+		defer println("in goroutine")
+		panic("")
+	}()
+
+	time.Sleep(1 * time.Second)
+}
+
+$ go run main.go
+in goroutine
+panic:
+```
+
+
+
