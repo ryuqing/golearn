@@ -27,30 +27,72 @@ go test 是一个轻量级的单元测试框架（第 13 章）
 ```
 
 #### 第四章 基本结构和基本数据类型
-4.24 类型
+**4.24 类型**
 类型可以是基本类型，如：int、float、bool、string；结构化的（复合的），如：struct、array、slice、map、channel；只描述类型的行为的，如：interface。
 结构化的类型使用nil作为默认值
 
-4.3 常量
+打印变量类型：
+
+**4.3 常量**
 ```
 常量使用关键字 const 定义，用于存储不会改变的数据。
 存储在常量中的数据类型只可以是布尔型、数字型（整数型、浮点型和复数）和字符串型。
 ```
 
-4.4-4.6 变量
+**4.4-4.6 变量**
+
 1. 变量被声明后系统会赋予默认值：：int 为 0，float 为 0.0，bool 为 false，string 为空字符串，指针为 nil
 
 2. 变量的作用域：
 全局变量在函数外，局部变量一般可以通过代码块来判断   
 当代码块内外有一个相同变量名时，代码块内的变量临时会起作用外部的会临时隐藏 结束时：内部的同名变量被释放，外部的又会重新显示
 
-3. 变量转换类型转换（参考4.26）valueOfTypeB = typeB(valueOfTypeA)
+3. 变量的复制
+int、float、bool 和 string 这些基本类型都属于值类型 复制只是值复制
+数组结构体也是值复制
+
+map、切片、函数 的复制只有引用（地址）被复制，所以改变一个变量另一个也会被改变
+
+注意看下面这段两端代码的不同 （详情参考：https://cloud.tencent.com/developer/article/1870553）
+```
+//使用new来实现结构体的浅拷贝
+function main()
+{
+    p1 := new(person) //new 和 make会返回内存地址
+    p1.HouseIds = [2]int{22, 33}
+    p1.Name = "songjiang"
+    p1.Age = 20
+    
+    p2.Age = 19
+    p2.Name = "likui"
+    p2.HouseIds[1] = 44
+    fmt.Printf("%v %p \n", p1, p1)  // &{likui 19 [22 44]} 0xc000076180
+    fmt.Printf("%v %p \n", p2, p2)  // &{likui 19 [22 44]} 0xc000076180
+}
+```
+```
+func main() {
+	var p1 person
+	p1.Name = "Lily"
+	p1.Age = 20
+
+	p2 := p1
+	p2.Name = "Lucy"
+	p2.Age = 19
+
+	p2.HouseIds = [2]int{22, 33}
+	fmt.Println(p1)  //{Lily 20 [0 0]}
+	fmt.Println(p2) //{Lucy 19 [22 33]}
+}
+```
+
+4. 变量转换类型转换（参考4.26）valueOfTypeB = typeB(valueOfTypeA)
 ```
 a = string(s)  //string 转换
 b := uint64(0) //来同时完成类型转换和赋值操作
 ```
 
-4. int/unit 和float
+5. int/unit 和float
 ```
 int/unit(8-64)int类型默认是int64/32 依机器类型而定
 float：
@@ -61,26 +103,48 @@ float64（+- 5  1e-324 -> 107  1e308）
 注意：当从一个取值范围较大的转换到取值范围较小的类型时（例如将 int32 转换为 int16 或将 float32 转换为 int），会发生精度丢失（截断）的情况
 ```
 
-5. 字符串处理包 strings 和 strconv包 （[用法参考此链接或官方手册](https://learnku.com/docs/the-way-to-go/strings-and-strconv-packages/3588))
+6. 字符串处理包 strings 和 strconv包 （[用法参考此链接或官方手册](https://learnku.com/docs/the-way-to-go/strings-and-strconv-packages/3588))
 
+
+#### 第七章 数组和切片
+
+数组：相同类型固定长度的数据序列 声明：`var varr1 [5]int`  
+切片:无固定长度，初始化：`var slice1 []type = arr1[start:end]` 和 make([]int, 5)
 
 
 #### 第九章 包
 
-注：原文这一块讲的不是很好并且过时不适用了-- 所以原文可以忽略不看
+注：原文这一块讲的不是很好并且过时不适用了-- 所以原文可以忽略不看,
 所以参考的网络文章：https://cloud.tencent.com/developer/article/1859833
 
 Go1.12 版本后, 使用go modules进行包管理
 
 
 #### 第十章、十一章 <结构体方法>和<接口与反射>观看视频更加高效
-主要了解go里面"类"、方法、继承等如何使用
+>主要了解go里面"类"、方法、继承等如何使用
+
+**1.结构体的标签**
+结构体的标签有的时候很有用，比如结构体首字母必须大写才能转成json，这个时候可以通过标签指定各个field在json中的key名称
+```
+type depthType struct {
+	Id string `json:"id"`
+	Asks [][]string `json:"asks"`
+	Bids [][]string `json:"bids"`
+}
+```
+
+
+
+
+
+
 
 
 #### 第十三章 错误处理与测试
 > 通过学习这一章，我们得会知道如何优雅的处理程序的错误。
 
 **13.1 错误处理**
+
 go中有一个预定义的错误
 ```
 type error interface {
@@ -89,9 +153,7 @@ type error interface {
 //自定义错误
 var errNotFound error = errors.New("Not found error")
 
-
 ```
-
 
 
 **13.2-13.3: 两个关键字 panic和recover**
@@ -115,6 +177,14 @@ $ go run main.go
 in goroutine
 panic:
 ```
+
+
+#### 第十四章go语言通道
+
+定义：var chanName chan string 或 chanName := make(chan string)
+向通道发送消息：chanName <- msg ; 接收信息 receive := <-chanName
+还有：默认情况下，通信是同步且无缓冲的：在有接收者接收数据之前，发送不会结束
+
 
 
 
